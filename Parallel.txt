@@ -1,0 +1,262 @@
+=#=#=#=#=#=#=#=#=#=#=#=#=#= Parallel library documentation =#=#=#=#=#=#=#=#=#=#=#=#=#=
+
+* This library is powered for easier implementation of the 2nd task of informatics.
+It consist of some classes thad provide you more comfortable work with threads. Now you
+can easy complete your tasks!
+* Library is open-source project, created only for fun ;)
+
+* There are special classes:
+
+==================================== ThreadPool<Num> ====================================
+
+* This class is a classical thread pool that have Num threads that are always active.
+  You can add ONLY void functions that have 0 arguments such as "void foo() {...}"!
+  All functions pushed into a queue WILL completed.
+
+** Methods:
+
+	add_work(function)	- push the function into a queqe
+	start_all()		- start all threads
+	stop_all()		- threads will be stopped WHEN all functions will be completed
+	is_active()		- returns are threads activated
+	empty()			- returns is work queqe empty
+
+** Example:
+
+std::mutex g_m;			// mutex for the correct printing
+void foo() {			// function that will pe pushed into a queue
+	g_m.lock();		// lock mutex
+	std::cout << "foo!\n";	// print some
+	g_m.unlock();		// unlock mutex
+}
+int main() {
+	ThreadPool<4> tp;	// create ThreadPool with 4 threads
+	tp.start_all();		// activate it
+	tp.add_work(foo);	// push function
+	tp.add_work(foo);	// and again
+				// in the end threads will be stopped
+				//  and ALL work WILL be completed!
+}
+
+================================= OneFunctionThreadPool =================================
+
+* This class is suitable when you need a thread pool that will do one functions but with
+  different arguments (such as integrate from 0 to 1 and from 1 to 2). To create this thread
+  pool there is a special function makeOneFunctionThreadPool<Num>(foo, arg_1, arg_2, ...)
+  Arguments there are needed to show what types are arguments of the invokavle function!
+  But they woun't be used! So you need to write them correctly! Example:
+
+void foo(int a, float b, double c, char d) {
+	// do some
+}
+int main() {
+	auto thrpl = makeOneFunctionThreadPool<5>(foo, 1, 2.0f, 3.0, 'a');
+		// those arguments WOUN'T be used! ->   ^    ^    ^    ^
+}
+
+** Methods:
+
+	add_work(arg_1, ard_2, ...)	// add args for the function,
+					//  they WILL be invoked in function
+	start_all()		- start all threads
+	stop_all()		- threads will be stopped WHEN all functions will be completed
+	is_active()		- returns are threads activated
+	empty()			- returns is work queqe empty
+
+** Example:
+
+void foo(int a, float b, double c, char d) {
+	// do some
+	// imagine yourself
+}
+int main() {
+		// that '5' is a number of threads, must be const!
+	auto thrpl = makeOneFunctionThreadPool<5>(foo, 1, 2.0f, 3.0, 'a');
+		// those arguments WOUNT be used! ->   ^    ^    ^    ^
+	thrpl.add_work(1, 2.2f, -3.4, 'e');	// add more args
+	thrpl.add_work(2, -0.4f, 9.5, 'k');	// and more
+	thrpl.add_work(9, 12.4f, 9.8, 'n');	// and more
+						// all that work will be done
+}
+
+=================================== DynamicThreadPool ===================================
+
+* This is exactly the same as ThreadPool, but with changable munber os threads
+
+** Methods:
+
+	add_work(function)	- push the function into a queqe
+	start_all()		- start all threads
+	stop_all()		- threads will be stopped WHEN all functions will be completed
+	is_active()		- returns are threads activated
+	empty()			- returns is work queqe empty
+	resize(new_size)	- stop all threads and change their number
+
+** Example:
+
+std::mutex g_m;			// mutex for the correct printing
+void foo() {			// function that will pe pushed into a queue
+	g_m.lock();		// lock mutex
+	std::cout << "foo!\n";	// print some
+	g_m.unlock();		// unlock mutex
+}
+int main() {
+	DynamicThreadPool dtp;	// create ThreadPool with 4 threads
+	dtp.start_all();	// activate it
+	dtp.add_work(foo);	// push function
+	dtp.add_work(foo);	// and again
+				// in the end threads will be stopped
+				//  and ALL work WILL be completed!
+}
+
+============================== DynamicOneFunctionThreadPool =============================
+
+* This is exactly the same as OneFunctionThreadPool, but with changable munber os threads
+  There is also special create function makeDynamicOneFunctionThreadPool(num, foo, args...)
+  args... are also needed to correct defenition of types, that are in the arguments of function
+  and woun't be used as a real job
+
+** Methods:
+
+	add_work(arg_1, ard_2, ...)	// add args for the function,
+					//  they WILL be invoked in function
+	start_all()		- start all threads
+	stop_all()		- threads will be stopped WHEN all functions will be completed
+	is_active()		- returns are threads activated
+	empty()			- returns is work queqe empty
+	resize(new_size)	- stop all threads and change their number
+
+** Example:
+
+void foo(int a, float b, double c, char d) {
+	// do some
+	// imagine yourself, huh?
+}
+int main() {
+		// that '5' is a number of threads
+	auto thrpl = makeDynamicOneFunctionThreadPool(5, foo, 1, 2.0f, 3.0, 'a');
+		// those arguments WOUNT be used! ->          ^    ^    ^    ^
+	thrpl.add_work(1, 2.2f, -3.4, 'e');	// add more args
+	thrpl.add_work(2, -0.4f, 9.5, 'k');	// and more
+	thrpl.add_work(9, 12.4f, 9.8, 'n');	// and more
+						// all that work will be done
+}
+
+================================== ThreadsafeVariable ===================================
+
+* This is a class that describes thread-safe ARITHMETICAL variable such as int, float etc.
+  You can use it as usual variables, but it's provided that all operations with them are thread-safe.
+  Very useful to global variables and not only them!
+
+** Methods:
+
+	get()			// return value from class
+	set(value)		// set 'value' as a class field value
+
+** Operators:
+	There "TV" is ThreadsafeVariable, "UV" - usual variable
+	TV = UV, TV = TV,
+	TV +-*/ TV, TV +-*/ UV, UV +-*/ TV
+	TV += -= *= /= TV, TV += -= *= /= UV, UV += -= *= /= TV
+  Also you can write like that:
+	ThreadsafeVariable<int> t_val = 3;
+	int u_ival = int(t_val);
+	float u_fval = float(t_val);
+  So you have a gread freedom of using it. Very good!And that's not all!
+  You can input or output them usin any possible streams with operators >> and << or use any function
+  suitable for usual variables with function call(foo, t_val) like that:
+
+int foo(int val) 						// function accept int and returns int
+	return val*val;
+}
+int main() {
+	ThreadsafeVariable<int> t_val = 3;			// create variable
+	ThreadsafeVariable<int> result = call(foo, t_val);	// call function for it
+	std::cout << result << '\n';				// printing what we have
+}
+
+  And all that you can do safety in different threads, without any thoughts about locking ore unlocking!
+  Fantastic, huh? ;)
+
+** Some derivable types:
+
+ThreadsafeBool			= ThreadsafeVariable<bool>;
+ThreadsafeChar			= ThreadsafeVariable<char>;
+ThreadsafeSignedChar		= ThreadsafeVariable<signed char>;
+ThreadsafeUnsignedChar		= ThreadsafeVariable<unsigned char>;
+ThreadsafeWcharT		= ThreadsafeVariable<wchar_t>;
+ThreadsafeChar8T		= ThreadsafeVariable<char8_t>;
+ThreadsafeChar16T		= ThreadsafeVariable<char16_t>;
+ThreadsafeChar32T		= ThreadsafeVariable<char32_t>;
+ThreadsafeShort			= ThreadsafeVariable<short>;
+ThreadsafeUnsignedShort		= ThreadsafeVariable<unsigned short>;
+ThreadsafeInt			= ThreadsafeVariable<int>;
+ThreadsafeUnsignedInt		= ThreadsafeVariable<unsigned int>;
+ThreadsafeLongInt		= ThreadsafeVariable<long int>;
+ThreadsafeUnsignedLongInt	= ThreadsafeVariable<unsigned long int>;
+ThreadsafeLongLongInt		= ThreadsafeVariable<long long int>;
+ThreadsafeUnsignedLongLongInt 	= ThreadsafeVariable<unsigned long long int>;
+ThreadsafeFloat			= ThreadsafeVariable<float>;
+ThreadsafeDouble		= ThreadsafeVariable<double>;
+ThreadsafeLongDouble		= ThreadsafeVariable<long double>;
+
+==================================== ThreadsafeObject ===================================
+
+* This is a wrapper like ThreadsafeVariable but for objects, not only for numbers. And there you need
+  to call lock() and unlock() when you need. But that is also easier than having hundred uf mutexes
+  and looking for them.
+
+** Methods:
+
+	lock()			// lock object
+	unlock()		// unlock object
+	get()			// gives you a copy or a reference to
+				//  the containing object (in case what you need in context)
+	operator ->		// returns a pointer to the consisting object
+	operator *		// returns a reference (or const reference) to the consisting object
+	operator &		// returns an adress of the consisting object
+
+** Example:
+
+struct Data {
+	// some data
+}
+Data g_data1, g_data2, g_data3;
+
+void foo() {			// thread function
+	g_data1.lock();		// without it you need to have 3 more global mutexes
+	g_data2.lock();		//  and not to forget which mutex is for what object
+	g_data3.lock();
+	// use data
+	g_data1.unlock();
+	g_data2.unlock();
+	g_data3.unlock();
+}
+
+=================================== ThreadsafeIostream ==================================
+
+* This is a protected version of std::istream and std::ostream in one case! There is also
+  a global object "Iostr" which you can use as std::cin and std::cout. For example:
+
+void foo() {					// thread function
+	int value;
+	Iostr.lock();				// lock Iostr for working with it
+	Iostr << "Input some int value\n";	// output some
+	Iostr >> value;				// and input some
+	Iostr.unlock();				// and unlock Iostr
+}
+
+** Methods:
+
+	lock()			// locks Iostr
+	unlock()		// unlocks Iostr
+
+====================================== Important! =======================================
+
+* This library is developed for the latest language standart c++17 and WOULD'T WORK
+  with earlier versions! Read how to enable c++17 standart in your compiler before!
+
+======================================= About us ========================================
+
+* Developed and debugged by Dorokhov Dmitry
+  Tested by Vedernikov Andrey (if something doesn't work - all qoustions to him!)
