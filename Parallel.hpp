@@ -668,6 +668,6 @@ template<typename _Ty> struct Is_thread_safe<ThreadsafeIostreamBase<_Ty>> : std:
 template<> struct Is_thread_safe<ThreadsafeIostream> : std::true_type {};
 #endif // !__ONLY_USUAL_IOSTREAM__
 template<typename _Ty> inline constexpr bool Is_thread_safe_v = Is_thread_safe<_Ty>::value;
-#endif // CXX_17
+#endif // _HAS_CXX17
 //	----------------------== powered by Dmitry Dorokhov ==----------------------
 #endif // !__PARALLEL__
