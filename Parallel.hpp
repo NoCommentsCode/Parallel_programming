@@ -1,3 +1,11 @@
+/*
+ *	Parallel.hpp
+ *	Version:			b.0.2.0
+ *	Created:			27.04.2020
+ *	Last update:		29.04.2020
+ *	Language standart:	ISO C++17
+ *	Developed by:		Dorokhov Dmitry
+*/
 #pragma once
 #ifndef __PARALLEL__
 #define __PARALLEL__
@@ -594,8 +602,11 @@ using ThreadsafeFloat				= ThreadsafeVariable<float>;
 using ThreadsafeDouble				= ThreadsafeVariable<double>;
 using ThreadsafeLongDouble			= ThreadsafeVariable<long double>;
 //	class template ThreadsafeObject
-template<typename _Objty, typename _Mty = std::mutex> class ThreadsafeObject {
+template<typename _Objty, typename _Mty = std::mutex, typename std::enable_if_t<!std::is_final_v<_Objty> &&
+	!std::is_arithmetic_v<_Objty>>* = nullptr> class ThreadsafeObject : public _Objty, public _Mty {
 	using _Check_mutex = std::void_t<decltype(std::declval<_Mty>().lock()), decltype(std::declval<_Mty>().unlock())>;
+	using _Base_obj = _Objty;
+	using _Base_mty = _Mty;
 public:
 	using value_type = _Objty;
 	using pointer = _Objty*;
@@ -607,35 +618,18 @@ public:
 
 	static_assert(std::is_object_v<value_type>, "type is not an object!");
 	static_assert(std::is_default_constructible_v<value_type>, "type is not default-constructible!");
-	//static_assert(std::is_copy_assignable_v<value_type>, "type is not copy-assignable!");
+	static_assert(std::is_copy_assignable_v<value_type>, "type is not copy-assignable!");
 	static_assert(std::is_copy_constructible_v<value_type>, "type is not copy-constructible!");
 
-	explicit ThreadsafeObject(const value_type& value = value_type()) : _value(value) {};
+	explicit ThreadsafeObject(const value_type& value = value_type()) : _Base_obj(value) {};
 	template<typename... _Args, typename std::enable_if_t<std::is_constructible_v<value_type, _Args...>>* = nullptr>
-	ThreadsafeObject(_Args&&... args) : _value(std::forward<_Args>(args)...) {};
-
-	inline void lock() const { _mute.lock(); return *this; };
-	inline void unlock() const { _mute.unlock(); return *this; };
-	value_type get() const noexcept { return _value; };
-	reference get() noexcept { return _value; };
-	pointer operator ->() { return &_value; };
-	reference operator *() { return _value; };
-	const_reference operator *() const { return _value; };
-	pointer operator &() const noexcept(noexcept(std::addressof(_value))) {
-		_mute.lock();
-		pointer ret = std::addressof(_value);
-		_mute.unlock();
-		return ret;
-	};
-
-private:
-	value_type _value;
-	mutable mutex_type _mute;
+	ThreadsafeObject(_Args&&... args) : _Base_obj(std::forward<_Args>(args)...) {};
 };
 #ifndef __ONLY_USUAL_IOSTREAM__
 //	class template ThreadsafeOstream
 #include <iostream>
-template<typename _Is = std::istream, typename _Os = std::ostream, typename _Mty = std::mutex> class ThreadsafeIostreamBase {
+template<typename _Is = std::istream, typename _Os = std::ostream, typename _Mty = std::mutex>
+class ThreadsafeIostreamBase : public _Mty {
 	using _Check_mutex = std::void_t<decltype(std::declval<_Mty>().lock()), decltype(std::declval<_Mty>().unlock())>;
 public:
 	using mutex_type = _Mty;
@@ -648,13 +642,10 @@ public:
 
 	template<typename _Ty> ThreadsafeIostreamBase& operator << (const _Ty& value) { _os << value; return *this; };
 	template<typename _Ty> ThreadsafeIostreamBase& operator >> (_Ty& value) { _is >> value; return *this; };
-	inline ThreadsafeIostreamBase& lock() { _mute.lock(); return *this; };
-	inline ThreadsafeIostreamBase& unlock() { _mute.unlock(); return *this; };
 	
 private:
 	ostream_type& _os;
 	istream_type& _is;
-	mutable mutex_type _mute;
 };
 using ThreadsafeIostream = ThreadsafeIostreamBase<>;
 ThreadsafeIostream Iostr(std::cout, std::cin);
