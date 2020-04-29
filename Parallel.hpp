@@ -580,27 +580,27 @@ ThreadsafeVariable<std::invoke_result_t<_Funct, _Ty>> call(_Funct&& foo, const T
 	return ThreadsafeVariable<std::invoke_result_t<_Funct, _Ty>>(foo(arg.get()));
 };
 //	some default specifiers
-using ThreadsafeBool				= ThreadsafeVariable<bool>;
-using ThreadsafeChar				= ThreadsafeVariable<char>;
-using ThreadsafeSignedChar			= ThreadsafeVariable<signed char>;
+using ThreadsafeBool			= ThreadsafeVariable<bool>;
+using ThreadsafeChar			= ThreadsafeVariable<char>;
+using ThreadsafeSignedChar		= ThreadsafeVariable<signed char>;
 using ThreadsafeUnsignedChar		= ThreadsafeVariable<unsigned char>;
-using ThreadsafeWcharT				= ThreadsafeVariable<wchar_t>;
+using ThreadsafeWcharT			= ThreadsafeVariable<wchar_t>;
 #ifdef __cpp_char8_t
-using ThreadsafeChar8T				= ThreadsafeVariable<char8_t>;
+using ThreadsafeChar8T			= ThreadsafeVariable<char8_t>;
 #endif // __cpp_char8_t
-using ThreadsafeChar16T				= ThreadsafeVariable<char16_t>;
-using ThreadsafeChar32T				= ThreadsafeVariable<char32_t>;
-using ThreadsafeShort				= ThreadsafeVariable<short>;
+using ThreadsafeChar16T			= ThreadsafeVariable<char16_t>;
+using ThreadsafeChar32T			= ThreadsafeVariable<char32_t>;
+using ThreadsafeShort			= ThreadsafeVariable<short>;
 using ThreadsafeUnsignedShort		= ThreadsafeVariable<unsigned short>;
-using ThreadsafeInt					= ThreadsafeVariable<int>;
-using ThreadsafeUnsignedInt			= ThreadsafeVariable<unsigned int>;
-using ThreadsafeLongInt				= ThreadsafeVariable<long int>;
+using ThreadsafeInt			= ThreadsafeVariable<int>;
+using ThreadsafeUnsignedInt		= ThreadsafeVariable<unsigned int>;
+using ThreadsafeLongInt			= ThreadsafeVariable<long int>;
 using ThreadsafeUnsignedLongInt		= ThreadsafeVariable<unsigned long int>;
-using ThreadsafeLongLongInt			= ThreadsafeVariable<long long int>;
-using ThreadsafeUnsignedLongLongInt = ThreadsafeVariable<unsigned long long int>;
-using ThreadsafeFloat				= ThreadsafeVariable<float>;
-using ThreadsafeDouble				= ThreadsafeVariable<double>;
-using ThreadsafeLongDouble			= ThreadsafeVariable<long double>;
+using ThreadsafeLongLongInt		= ThreadsafeVariable<long long int>;
+using ThreadsafeUnsignedLongLongInt	= ThreadsafeVariable<unsigned long long int>;
+using ThreadsafeFloat			= ThreadsafeVariable<float>;
+using ThreadsafeDouble			= ThreadsafeVariable<double>;
+using ThreadsafeLongDouble		= ThreadsafeVariable<long double>;
 //	class template ThreadsafeObject
 template<typename _Objty, typename _Mty = std::mutex, typename std::enable_if_t<!std::is_final_v<_Objty> &&
 	!std::is_arithmetic_v<_Objty>>* = nullptr> class ThreadsafeObject : public _Objty, public _Mty {
@@ -659,6 +659,6 @@ template<typename _Ty> struct Is_thread_safe<ThreadsafeIostreamBase<_Ty>> : std:
 template<> struct Is_thread_safe<ThreadsafeIostream> : std::true_type {};
 #endif // !__ONLY_USUAL_IOSTREAM__
 template<typename _Ty> inline constexpr bool Is_thread_safe_v = Is_thread_safe<_Ty>::value;
-#endif // CXX_17
+#endif // _HAS_CXX17
 //	----------------------== powered by Dmitry Dorokhov ==----------------------
 #endif // !__PARALLEL__
