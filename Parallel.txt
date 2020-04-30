@@ -200,7 +200,7 @@ ThreadsafeFloat			= ThreadsafeVariable<float>;
 ThreadsafeDouble		= ThreadsafeVariable<double>;
 ThreadsafeLongDouble		= ThreadsafeVariable<long double>;
 
-==================================== ThreadsafeObject ===================================
+================================ ThreadsafeObject<_Objty> ===============================
 
 * This is a wrapper like ThreadsafeVariable but for objects, not only for numbers. And there you need
   to call lock() and unlock() when you need. But that is also easier than having hundred uf mutexes
@@ -210,11 +210,8 @@ ThreadsafeLongDouble		= ThreadsafeVariable<long double>;
 
 	lock()			// lock object
 	unlock()		// unlock object
-	get()			// gives you a copy or a reference to
-				//  the containing object (in case what you need in context)
-	operator ->		// returns a pointer to the consisting object
-	operator *		// returns a reference (or const reference) to the consisting object
-	operator &		// returns an adress of the consisting object
+	...			// and all methods that are in _Objty class			
+
 
 ** Example:
 
