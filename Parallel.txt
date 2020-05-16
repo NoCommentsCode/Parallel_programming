@@ -248,6 +248,11 @@ void foo() {					// thread function
 	lock()			// locks Iostr
 	unlock()		// unlocks Iostr
 
+* There is a function print_safe(...). You can use it as a threadsafe variant of printing.
+  If you need to write std::cout << x << ' ' << "is a variable" << '\n';
+  you cah change it into print_safe(x, ' ', "is a variable", '\n');
+  There can be any count of arguments. Warning! std::endl can't be used there. Use '\n'.
+
 ====================================== Important! =======================================
 
 * This library is developed for the latest language standart c++17 and WOULD'T WORK
