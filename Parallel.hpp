@@ -1,6 +1,6 @@
 /*
  *	Parallel.hpp
- *	Version:			b.0.3.2
+ *	Version:			b.0.3.3
  *	Created:			27.04.2020
  *	Last update:		15.05.2020
  *	Language standart:	ISO C++11
@@ -9,8 +9,11 @@
 #pragma once
 #ifndef __PARALLEL__
 #define __PARALLEL__
+#include <condition_variable>
 #include <type_traits>
 #include <functional>
+#include <thread>
+#include <vector>
 #include <queue>
 #include <mutex>
 #include <array>
