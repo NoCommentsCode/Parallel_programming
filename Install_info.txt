@@ -1,0 +1,10 @@
+=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#= Install information =#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=#=
+
+* If you hve MSVC compiler, it's better to use Parallel.hpp. Is can be used with
+  default settings of project (from ISO C++11 to ISO C++20). In other compilers it may
+  cause errors in template classes (and may not).
+* If you have problems with Parallel.hpp, i developed Parallel_lite.hpp. It's short
+  version of Parallel.hpp, but some options are removed in case of appearing errors
+  in other compilers like Code::Blocks. Try to use it.
+
+* If so,e errors appear, you can write me: dmd.rf@yandex.ru
