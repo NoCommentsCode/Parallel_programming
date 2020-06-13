@@ -1,0 +1,80 @@
+=#=#=#=#=#=#=#=#=#=#=#=#=#= Speed_test library documentation =#=#=#=#=#=#=#=#=#=#=#=#=#=
+
+* This library(ies) is(are) created to measuring time spent on function's working. There
+are functions that can call function, which working time you need to measure with your
+arguments and return time of implementation.
+* Speed_test.hpp is created cor MSVC compiller and Speed_test_lite.hpp is created for
+GCC compeler (tested in Code::Blocks with c++11 standart)
+
+* Functions of Speed_test.hpp and Speed_test_lite.hpp:
+
+** measureWithSavingResult<time_type>(function, args...)
+There 'time_type' is one of the standart time types:
+	std::chrono::hours
+	std::chrono::minutes
+	std::chrono::seconds
+	std::chrono::milliseconds
+	std::chrono::microseconds
+	std::chrono::nanoseconds
+'function' - is function to be measured
+'args...' - args for this function (may be no arguments)
+Function will return 'time_type' variable  with time spent for the function perfomance
+
+** measureWithSavingResult<time_type>(function, args...)
+Arguments for it are similar to previous function. You can use this function when you need
+not to just measure, but also save result (if function is very big and slow and you don't
+want to call it and spend your time just to measure). There are DIFFERENT RETURN TYPES in
+different cases!
+!!! If measuring function returns void - measureWithSavingResult return 'time_type' (no result)
+!!! Else it will return std::pair<time_type, result_type>(time, result)
+
+* Example:
+
+void foo1(int a) { return; };		//  this returns void
+char foo2(float a) { return 'a'; };	//  this returns not void
+int main() {
+	auto r1 = measureWithSavingResult<std::chrono::microseconds>(foo1, 2);
+	//  r1 is std::chrono::microseconds
+	auto r2 = measureWithSavingResult<std::chrono::microseconds>(foo2, 0.5);
+	//  r2 is std::pair<std::chrono::microseconds, char>
+	std::cout << "r1: " << r1.count() << '\n';
+	std::cout << "r2: " << r2.first.count() << "\tresult is: " << r2.second << '\n';
+}
+
+* Functions of Speed_test_C.h:
+
+** measureWithSavingResult(foo, param, ret)
+There 'foo' MUST return void* and receive void* like that: void* function(void* param),
+param is parameter for this function and must be void*, ret is also void* - result will
+be saved here. Function returns time of working in MILLISECONDS (unsigned long long int).
+
+** measureWithoutSavingResult(foo, param)
+There 'foo' MUST return void* and receive void* like that: void* function(void* param),
+param is parameter for this function and must be void*. Result will be LOST. Function
+returns time of working in MILLISECONDS (unsigned long long int).
+
+* Example:
+
+typedef struct param_t {
+	int a;
+	float b;
+} param_t;
+void* funct(void* param) {
+	param_t* p = (param_t*)(param);
+	printf("int = %d, float = %f\n", p->a, p->b);
+	Sleep(200);
+	return NULL;
+};
+int main() {
+	int ret = -1;
+	param_t param;
+	param.a = 10;
+	param.b = 2.5;
+	unsigned long long int t1 = measureWithoutSavingResult(funct, &param);
+	printf("t1 = %d\n", t1);
+	unsigned long long int t2 = measureWithSavingResult(funct, &param, &ret);
+	printf("t2 = %d", t2);
+	return 0;
+}
+
+* Developed and debugged by Dorokhov Dmitry
